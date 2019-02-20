@@ -1,0 +1,14 @@
+body{
+  background-color: lemonchiffon;
+  font-family: 'Noto Sans', sans-serif;
+}
+
+.container-fluid{
+  background-color: black;
+  border: 1px solid black;
+  color: white;
+}
+
+.main p, aside p {
+  text-align: justify;
+}

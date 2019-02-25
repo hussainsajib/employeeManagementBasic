@@ -16,11 +16,37 @@ var multer = require('multer');
 var fs = require('fs');
 var bodyParser = require('body-parser');
 var dataService = require("./data-service.js");
+var exphbs = require('express-handlebars');
 var app = express();
 var port = process.env.PORT || 8080;
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.engine('.hbs', exphbs({
+    defaultLayout: 'main',
+    extname: '.hbs',
+    helpers:{
+      navLink: (url,options)=>{
+        return '<li'+((url == app.locals.activeRoute) ? ' class="active" ' : '') +
+        '><a href="' + url + '">' + options.fn(this) + '</a></li>';
+      },
+      equal:(lvalue,rvalue,options)=>{
+          if(arguments.length < 3){
+              throw new Error("Handlebars Helper equal needs 2 parameters");
+          }
+          if(lvalue != rvalue){
+              return options.inverse(this);
+          }
+          else{
+              return options.fn(this);
+          }
+      }  
+    }
+
+    }));
+app.set('view engine','.hbs');
+
 
 const storage = multer.diskStorage({
     destination: "./public/images/uploaded",
@@ -30,6 +56,11 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
+app.use((request,response,next)=>{
+    let route = request.baseUrl + request.path;
+    app.locals.activeRoute = (route == "/") ? "/" : route.replace(/\/$/,"");
+    next(); 
+});
 
 app.post("/images/add", upload.single("imageFile"), (request,response)=>{
     response.redirect('/images');
@@ -42,12 +73,19 @@ app.post("/employees/add", (request,response)=>{
     });
 });
 
+app.post("/employee/update",(request,response)=>{
+    dataService.updateEmployee(request.body)
+    .then(()=>{
+        response.redirect("/employees");
+    });
+});
+
 app.get("/", function(request, response){
-    response.sendFile(path.join(__dirname,"/views/home.html"));
+    response.render("home.hbs");
 });
 
 app.get("/about", function(request,response){
-    response.sendFile(path.join(__dirname,"/views/about.html"));
+    response.render("about.hbs");
 });
 
 app.get("/employees", function(request,response){
@@ -55,7 +93,7 @@ app.get("/employees", function(request,response){
     let queryData;
     if(request.query.status != undefined){
         queryParam = request.query.status;
-        //console.log(queryParam);
+        
         queryData = dataService.getEmployeesByStatus(queryParam);
     } else if(request.query.department != undefined){
         queryParam = request.query.department;
@@ -66,24 +104,16 @@ app.get("/employees", function(request,response){
     } else {
         queryData = dataService.getAllEmployees();
     }
-    /*
-    var empData = dataService.getAllEmployees();
-    empData
-    .then(function(data){
-        response.json(data);
-    })
-    .catch(function(error){
-        response.send({
-            message: error,
-        });
-    })
-    */
+
     queryData.then((data)=>{
-       response.json(data);
+        
+        response.render("employees",{
+           employees: data
+       });
     })
     .catch((error)=>{
-        response.send({
-           message: error,
+        response.render({
+           message: "no results",
         })
    })
 });
@@ -91,10 +121,12 @@ app.get("/employees", function(request,response){
 app.get("/employee/:value",(request,response)=>{
     let employeeInfo = dataService.getEmployeeByNum(request.params.value);
     employeeInfo.then((data)=>{
-        response.json(data);
+        response.render("employee", { 
+            employee: data
+        });
     })
     .catch((error)=>{
-        response.send(error);
+        response.render("employee",{message: error});
     })
 });
 
@@ -104,16 +136,14 @@ app.get("/managers", function(request,response){
         response.send(data);
     })
     .catch(function(error){
-        response.send({
-            message:error,
-        })
+        response.send({ message:error })
     })
 });
 
 app.get("/departments", function(request,response){
     var departData = dataService.getDepartments();
     departData.then(function(data){
-        response.send(data);
+        response.render("departments",{ departments: data });
     })
     .catch(function(error){
         response.send({
@@ -127,8 +157,7 @@ app.get("/images", (request,response)=>{
         if(error){
             throw error;
         } else {
-            response.json({
-                //title: "Hello",
+            response.render("images",{
                 images: files
             });
         }
@@ -136,11 +165,11 @@ app.get("/images", (request,response)=>{
 });
 
 app.get("/employees/add",(request,response)=>{
-    response.sendFile(path.join(__dirname,"/views/addEmployee.html"));
+    response.render("addEmployee");
 });
 
 app.get("/images/add",(request,response)=>{
-    response.sendFile(path.join(__dirname,"/views/addImage.html"));
+    response.render("addImage");
 });
 
 app.get("*", function(request,response){

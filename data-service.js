@@ -103,13 +103,26 @@ module.exports.getEmployeesByManager = (manager)=>{
 }
 
 module.exports.getEmployeeByNum = (eNumber) =>{
-  let empNumber = [];
+  let empNumber;
   return new Promise((resolve,reject)=>{
     for(let i = 0; i < employees.length; i++){
       if(employees[i].employeeNum == parseInt(eNumber)){
-        empNumber.push(employees[i]);
+        empNumber = employees[i];
       }
     }
-    empNumber.length ? resolve(empNumber) : reject("No employee found with the employee number");
+    empNumber ? resolve(empNumber) : reject("No employee found with the employee number");
+  })
+}
+
+module.exports.updateEmployee = (employeeData)=>{
+  let employeeUpdate;
+  //console.log(employeeData);
+  return new Promise((resolve,reject)=>{
+    for(let i = 0; i < employees.length; i++){
+      if(employees[i].employeeNum == employeeData.employeeNum){
+        employees[i] = employeeData;
+      }
+    }
+    resolve();
   })
 }

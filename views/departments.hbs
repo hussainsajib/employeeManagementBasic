@@ -1,0 +1,26 @@
+<div class="row">
+    <div class="col-md-12">
+        <h2>Departments</h2>
+        <hr>
+        <div class="table-responsive">
+            <table>
+                <tr>
+                    <th>Department Number</th>
+                    <th>Department Name</th>
+                </tr>
+                {{#each departments}}
+                    <tr>
+                        <td><a href="/employees?department={{departmentId}}">{{departmentId}}</a></td>
+                        <td><a href="/employees?department={{departmentId}}">{{departmentName}}</a></td>
+                    </tr>
+                {{else}}
+                    <div class="col-md-12 text-center">
+                        <strong>{{message}}</strong>
+                    </div>
+                {{/each}}
+
+
+            </table>
+        </div>
+    </div>
+</div>

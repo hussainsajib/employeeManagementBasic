@@ -12,3 +12,11 @@ body{
 .main p, aside p {
   text-align: justify;
 }
+
+.col-md-4 img{
+  float: left;
+  max-width: 300px;
+  max-height: 500px;
+  width: auto;
+  height: auto;
+}

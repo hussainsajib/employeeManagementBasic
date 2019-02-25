@@ -3,6 +3,10 @@ body{
   font-family: 'Noto Sans', sans-serif;
 }
 
+tr th, tr td{
+  text-align: center;
+}
+
 .container-fluid{
   background-color: black;
   border: 1px solid black;

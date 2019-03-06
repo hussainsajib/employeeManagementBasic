@@ -106,21 +106,23 @@ app.get("/employees", function(request,response){
     }
 
     queryData.then((data)=>{
-        
-        response.render("employees",{
-           employees: data
-       });
+        if(data.length > 0 ){
+            response.render("employees",{
+                employees: data
+            });
+
+        } else {
+            response.render("employees", {message:"No Results Found"} );
+        }
     })
     .catch((error)=>{
-        response.render({
-           message: "no results",
-        })
+        response.render("employees",{ message: error }); 
    })
 });
 
 app.get("/employee/:value",(request,response)=>{
     let employeeInfo = dataService.getEmployeeByNum(request.params.value);
-    employeeInfo.then((data)=>{
+    employeeInfo.then(data=>{
         response.render("employee", { 
             employee: data
         });
@@ -132,23 +134,25 @@ app.get("/employee/:value",(request,response)=>{
 
 app.get("/managers", function(request,response){
     var manData = dataService.getManager();
-    manData.then(function(data){
+    manData.then(data=>{
         response.send(data);
     })
-    .catch(function(error){
+    .catch(error=>{
         response.send({ message:error })
     })
 });
 
 app.get("/departments", function(request,response){
     var departData = dataService.getDepartments();
-    departData.then(function(data){
-        response.render("departments",{ departments: data });
+    departData.then(data=>{
+        if(data.length > 0){
+            response.render("departments", { departments: data });
+        }
+        else {
+            response.render("departments", { message: "No Data" });
+        }
     })
-    .catch(function(error){
-        response.send({
-            message:error,
-        })
+    .catch(error=>{ response.render("departments",{ message: error });
     })
 });
 
@@ -168,11 +172,9 @@ app.get("/employees/add",(request,response)=>{
     response.render("addEmployee");
 });
 
-app.get("/images/add",(request,response)=>{
-    response.render("addImage");
-});
+app.get("/images/add",(request,response)=>response.render("addImage") );
 
-app.get("*", function(request,response){
+app.get("*", (request,response)=>{
     response.status(404);
     response.sendFile(path.join(__dirname,"/views/404.html"));
 });
@@ -182,6 +184,6 @@ init
 .then(app.listen(port, function(){
     console.log("Express http server listening on " +port);
 }))
-.catch(function(msg){
+.catch(msg=>{
     console.log(msg);
 })

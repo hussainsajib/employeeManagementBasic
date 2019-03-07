@@ -67,7 +67,7 @@ module.exports.getManager = function(){
 module.exports.getDepartments = ()=>{
   return new Promise(function(resolve,reject){
     Department.findAll()
-    .then(date=>resolve(data))
+    .then(data=>resolve(data))
     .catch(error=>reject("No results found"))
   })
 }
@@ -114,7 +114,7 @@ module.exports.getEmployeeByNum = (eNumber) =>{
   //let empNumber;
   return new Promise((resolve,reject)=>{
     Employee.findAll({ where: { employeeNum: eNumber }})
-    .then(data=>resoleve(data))
+    .then(data=>resoleve(data[0]))
     .catch(error=>reject("No result for this employee number"));
   })
 }
@@ -130,6 +130,34 @@ module.exports.updateEmployee = employeeData=>{
       where: { employeeNum: employeeData.employeeNum }
     })
     .then(data=>resolve(data))
-    .catch(()=>reject("Unable to update the employee data"))
+    .catch((error)=>reject("Unable to update the employee data"))
+  })
+}
+
+module.exports.addDepartment = departmentData=>{
+  return new Promise((resolve,reject)=>{
+    if(departmentData.departmentName === "") { departmentName = null; }
+    Department.create(departmentData)
+    .then(()=>{ resolve(); })
+    .catch(()=>{ reject("Unable to create department"); })    
+  })
+}
+
+module.exports.updateDepartment = departmentData => {
+  return new Promise((resolve, reject)=>{
+    if(departmentData.departmentName === "") { departmentData.departmentName = null; }
+    Department.update(departmentData,{
+      where: { departmentId: departmentData.departmentId }
+    })
+    .then(data=>resolve(data))
+    .catch(error=>reject(`Unable to update department`))
+  })
+}
+
+module.exports.getDepartmentById = id=>{
+  return new Promise((resolve,reject)=>{
+    Department.findAll({ where: { departmentId: id }})
+    .then(data=>resolve(data[0]))
+    .catch(error=>reject("No result for this department number"));
   })
 }

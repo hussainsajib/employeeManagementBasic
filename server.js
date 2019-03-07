@@ -168,11 +168,43 @@ app.get("/images", (request,response)=>{
     });
 });
 
+app.get("/images/add",(request,response)=>response.render("addImage") );
+
 app.get("/employees/add",(request,response)=>{
     response.render("addEmployee");
 });
 
-app.get("/images/add",(request,response)=>response.render("addImage") );
+app.get("/departments/add",(request,response)=>{
+    response.render("adddepartment");
+});
+
+app.post("/departments/add",(request,response)=>{
+    dataService.addDepartment(request.body)
+    .then(()=>response.redirect("/departments"))
+    .catch(error=>response.send(`Error: ${error}`))
+});
+
+app.post("/department/update",(request,response)=>{
+    dataService.updateDepartment(request.body)
+    .then(()=>response.redirect("/departments"))
+    .catch(error=>response.send(`Error: ${error}`))
+});
+
+app.get("/department/:departmentId",(request,response)=>{
+    dataService.getDepartmentById(request.params.departmentId)
+    .then(data=>{
+        if(data !== undefined){
+            response.render("department", { 
+                department: data
+            });
+        } else{
+            response.status(404).send(`Department Not Found`);
+        }
+    })
+    .catch((error)=>{
+        response.status(404).send(`Department Not Found`);
+    })    
+});
 
 app.get("*", (request,response)=>{
     response.status(404);

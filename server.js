@@ -70,25 +70,27 @@ app.post("/employees/add", (request,response)=>{
     dataService.addEmployee(request.body)
     .then(()=>{
         response.redirect("/employees");
-    });
+    })
+    .catch(()=>response.status(500).send("Failed to add the employee"))
 });
 
 app.post("/employee/update",(request,response)=>{
     dataService.updateEmployee(request.body)
     .then(()=>{
         response.redirect("/employees");
-    });
+    })
+    .catch(()=>response.status(500).send("Failed to update the employee"))
 });
 
-app.get("/", function(request, response){
+app.get("/", (request, response)=>{
     response.render("home.hbs");
 });
 
-app.get("/about", function(request,response){
+app.get("/about", (request,response)=>{
     response.render("about.hbs");
 });
 
-app.get("/employees", function(request,response){
+app.get("/employees", (request,response)=>{
     let queryParam;
     let queryData;
     if(request.query.status != undefined){
@@ -120,6 +122,12 @@ app.get("/employees", function(request,response){
    })
 });
 
+app.get("/employees/delete/:empNum",(request,response)=>{
+    dataService.deleteEmployeeByNum(request.params.empNum)
+    .then(()=>response.redirect("/employees"))
+    .catch(()=>response.status(500).send(`Unable to Remove employee number ${request.params.empNum}/employee not found`));
+})
+
 app.get("/employee/:value",(request,response)=>{
     let employeeInfo = dataService.getEmployeeByNum(request.params.value);
     employeeInfo.then(data=>{
@@ -130,6 +138,42 @@ app.get("/employee/:value",(request,response)=>{
     .catch((error)=>{
         response.render("employee",{message: error});
     })
+});
+
+app.get("/employee/:empNum", (req, res) => {
+    // initialize an empty object to store the values
+    let viewData = {};
+    dataService.getEmployeeByNum(req.params.empNum)
+    .then((data) => {
+        if (data) {
+            viewData.employee = data; //store employee data in the "viewData" object as "employee"
+        } else {
+            viewData.employee = null; // set employee to null if none were returned
+        }
+    })
+    .catch(() => {
+        viewData.employee = null; // set employee to null if there was an error
+    })
+    .then(dataService.getDepartments)
+    .then((data) => {
+        viewData.departments = data; // store department data in the "viewData" object as "departments"
+        // loop through viewData.departments and once we have found the departmentId that matches
+        // the employee's "department" value, add a "selected" property to the matching
+        // viewData.departments object
+        for (let i = 0; i < viewData.departments.length; i++) {
+            if (viewData.departments[i].departmentId == viewData.employee.department) {
+                viewData.departments[i].selected = true;
+            }
+        }
+    }).catch(() => {
+        viewData.departments = []; // set departments to empty if there was an error
+    }).then(() => {
+        if (viewData.employee == null) { // if no employee - return an error
+            res.status(404).send("Employee Not Found");
+        } else {
+        res.render("employee", { viewData: viewData }); // render the "employee" view
+        }
+    });
 });
 
 app.get("/managers", function(request,response){
@@ -171,7 +215,14 @@ app.get("/images", (request,response)=>{
 app.get("/images/add",(request,response)=>response.render("addImage") );
 
 app.get("/employees/add",(request,response)=>{
-    response.render("addEmployee");
+    dataService.getDepartments()
+    .then(data=>{
+        response.render("addEmployee",{ departments: data });
+    })
+    .catch(error=>{
+        response.render("addEmpoyee",{departments: []});
+    })
+    
 });
 
 app.get("/departments/add",(request,response)=>{

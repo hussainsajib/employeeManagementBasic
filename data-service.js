@@ -161,3 +161,11 @@ module.exports.getDepartmentById = id=>{
     .catch(error=>reject("No result for this department number"));
   })
 }
+
+module.exports.deleteEmployeeByNum = empNum=>{
+  return new Promise((resolve,reject)=>{
+    Employee.destroy({where: {employeeNum: empNum}})
+    .then(()=>resolve())
+    .catch(()=>reject("There was an error removing the employee"))
+  })
+}

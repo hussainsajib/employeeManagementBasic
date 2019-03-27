@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var bcrypt = require('bcryptjs');
 var Schema = mongoose.Schema;
 const uri = 'mongodb://localhost/web322';
 let User; //to be defined on new connection

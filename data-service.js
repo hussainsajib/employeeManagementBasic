@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
-const database = "d92mjgtg0vn62s";
-const user = "eseqcduzxdlsrw";
-const password = "1628df051c4d6a0d343dc9096c115c260251944f28761604d64bb9d952cf1a21";
-const host = "ec2-54-243-128-95.compute-1.amazonaws.com";
+const database = "dklegpakor67m";
+const user = "ugmjmjhsfvytqq";
+const password = "6896e21d068c1cbffec674dd568593319c0b2f8618260e89dd93f31e3e9f6c30";
+const host = "ec2-54-221-236-144.compute-1.amazonaws.com";
 var sequelize = new Sequelize(database, user, password,{
   host: host,
   dialect: 'postgres',

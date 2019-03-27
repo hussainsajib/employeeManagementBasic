@@ -32,7 +32,7 @@ app.use(clientSessions({
 }));
 var ensureLogin = (request,response,next)=>{
     if(!request.session.user){
-        response.redirect("/loin");
+        response.redirect("/login");
     } else {
         next();
     }
@@ -130,7 +130,7 @@ app.get("/userHistory",ensureLogin,(request,response)=>{
     response.render("userHistory");
 });
 
-app.get("register",(request,response)=>{
+app.get("/register",(request,response)=>{
     response.render("register");
 });
 

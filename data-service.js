@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
-const database = "dklegpakor67m";
-const user = "ugmjmjhsfvytqq";
-const password = "6896e21d068c1cbffec674dd568593319c0b2f8618260e89dd93f31e3e9f6c30";
-const host = "ec2-54-221-236-144.compute-1.amazonaws.com";
+const database = process.env.POSTGRES_DATABASE;
+const user = process.env.POSTGRES_USER;
+const password = process.env.POSTGRES_PASSWORD;
+const host = process.env.POSTGRES_HOST;
 var sequelize = new Sequelize(database, user, password,{
   host: host,
   dialect: 'postgres',

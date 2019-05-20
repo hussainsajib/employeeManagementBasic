@@ -1,0 +1,7 @@
+dont_need_data/
+node_modules/
+
+
+
+.env
+postgres_credentials.txt
